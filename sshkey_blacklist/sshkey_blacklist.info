@@ -1,0 +1,4 @@
+name = SSH key blacklist checking
+description = "Validates SSH keys using the ssh-vulnkey blacklist."
+core = 7.x
+dependencies[] = sshkey

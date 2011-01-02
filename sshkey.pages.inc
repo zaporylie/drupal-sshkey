@@ -1,253 +1,225 @@
 <?php
 
-function sshkey_page_list_public_keys($user=NULL) {
-  drupal_add_css(drupal_get_path('module', 'sshkey') . '/css/sshkey.css');
+function sshkey_list_page($entity_type, $entity_id) {
+  $destination = drupal_get_destination();
 
-  $keys = sshkey_user_public_keys_list($user->uid);
-
-  $header = array(
-    array('data' => t('Fingerprint'), 'class' => 'sshkey-public-key-fingerprint'),
-    array('data' => t('Name'),        'class' => 'sshkey-public-key-name'),
-    array('data' => t('Created'),     'class' => 'sshkey-public-key-created'),
-    array('data' => t('Operations'),  'class' => 'sshkey-public-key-operations'),
-  );
-  $rows = array();
-
-  foreach ($keys as $key) {
-    $segmented = '';
-    for ($i=0; $i<8; $i+=2) {
-      $segmented .= substr($key['fingerprint'], $i, 2) . ':';
-    }
-
-    $data = array(
-      'fingerprint' => array(
-        'data'  => $segmented . '...',
-        'class' => 'sshkey-public-key-key',
-      ),
-      'name' => array(
-        'data'  => $key['name'],
-        'class' => 'sshkey-public-key-name',
-      ),
-      'created' => array(
-        'data'  => format_date($key['created']),
-        'class' => 'sshkey-public-key-created',
-      ),
+  // Add the local actions.
+  if (sshkey_access('create', $entity_type, $entity_id)) {
+    $local_actions['add'] = array(
+      'title' => t('Add a public key'),
+      'href' => "ssh-keys/{$entity_type}/{$entity_id}/add",
+      'query' => $destination,
+      'modal' => TRUE,
     );
-
-    $operations = array();
-    $operations[] = array(
-      'title' => t('Edit'),
-      'href'  => sprintf('user/%d/sshkeys/%s/edit', $key['uid'], $key['fingerprint']),
-      'query' => drupal_get_destination(),
-    );
-    $operations[] = array(
-      'title' => t('Delete'),
-      'href'  => sprintf('user/%d/sshkeys/%s/delete', $key['uid'], $key['fingerprint']),
-      'query' => drupal_get_destination(),
-    );
-
-    $rows[] = array(
-      'data' => $data + array(
-        'operations' => array(
-          'data'  => theme('links', $operations),
-          'class' => 'sshkey-public-key-operations',
-        ),
-      ),
-      'class' => 'sshkey-public-key-operations',
+    $build['actions'] = array(
+      '#theme' => 'links',
+      '#links' => $local_actions,
+      '#attributes' => array('class' => 'item-list action-links'),
     );
   }
 
-  $table = theme('sshkey_table', $header, $rows, array('id' => 'sshkey-public-list-key'));
-  $form = drupal_get_form('sshkey_add_public_key_form', $user);
-  return theme('sshkey_public_key_list_page', $table, $form);
+  $header = array(
+    'name' => array('data' => t('Title'), 'field' => 'title', 'sort' => 'asc'),
+    'fingerprint' => array('data' => t('Fingerpint'), 'field' => 'fingerprint'),
+    'operations' => array('data' => t('Operations')),
+  );
+
+  $query = db_select('sshkey')->extend('PagerDefault')->extend('TableSort');
+  $query->addField('sshkey', 'key_id');
+  $query->condition('entity_type', $entity_type);
+  $query->condition('entity_id', $entity_id);
+  $query->orderByHeader($header);
+  $query->limit(25);
+  $key_ids = $query->execute()->fetchCol();
+  $keys = sshkey_load_multiple($key_ids);
+
+  $rows = array();
+  foreach ($key_ids as $key_id) {
+    $key = $keys[$key_id];
+
+    $rows[$key_id]['title'] = check_plain($key->title);
+
+    // @todo Format fingerprint as xx:xx:xx...
+    $rows[$key_id]['fingerprint'] = $key->fingerprint;
+
+    $operations = array();
+    if (sshkey_access('edit', $entity_type, $entity_id, $key)) {
+      $operations['edit'] = array(
+        'title' => t('Edit'),
+        'href' => "ssh-keys/{$entity_type}/{$entity_id}/{$key_id}/edit",
+        'query' => $destination,
+        'modal' => TRUE,
+      );
+    }
+    if (sshkey_access('delete', $entity_type, $entity_id, $key)) {
+      $operations['delete'] = array(
+        'title' => t('Delete'),
+        'href' => "ssh-keys/{$entity_type}/{$entity_id}/{$key_id}/delete",
+        'query' => $destination,
+        'modal' => TRUE,
+      );
+    }
+    $rows[$key_id]['operations'] = array(
+      'data' => array(
+        '#theme' => 'links',
+        '#links' => $operations,
+        '#attributes' => array('class' => array('links', 'inline', 'nowrap')),
+      ),
+    );
+  }
+
+  $empty_text[] = t('No SSH public keys available.');
+  if (sshkey_access('create', $entity_type, $entity_id)) {
+    $empty_text[] = l(t('Add a public key'), "ssh-keys/{$entity_type}/{$entity_id}/add", array('query' => $destination, 'modal' => TRUE));
+  }
+
+  $build['keys_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => implode(' ', $empty_text),
+  );
+  $build['keys_table_pager'] = array('#theme' => 'pager');
+
+  //$build['pre_form_title'] = '<div><hr /><h3>Add a public key</h3>';
+  //$build['add_form'] = drupal_get_form('sshkey_edit_form', $entity_type, $entity_id);
+  //$build['post_add_form'] = '</div>';
+
+  return $build;
 }
 
-function sshkey_add_public_key_form($form_state, $account) {
-  $form = array();
+function sshkey_edit_form($form, $form_state, $entity_type, $entity_id, $key = NULL) {
+  $entity = entity_load($entity_type, array($entity_id));
+  $entity = reset($entity);
 
-  $form['user_object'] = array(
+  if (!isset($key)) {
+    $key = new stdClass();
+    $key->is_new = TRUE;
+    $key->key_id = NULL;
+    $key->fingerprint = NULL;
+    $key->title = '';
+    $key->value = '';
+    $key->entity_type = $entity_type;
+    $key->entity_id = $entity_id;
+  }
+
+  $form['#sshkey'] = $key;
+  $form['#entity'] = $entity;
+
+  $form['key_id'] = array(
     '#type' => 'value',
-    '#value' => $account,
+    '#value' => isset($key->key_id) ? $key->key_id : NULL,
+  );
+  $form['entity_type'] = array(
+    '#type' => 'value',
+    '#value' => $entity_type,
+  );
+  $form['entity_id'] = array(
+    '#type' => 'value',
+    '#value' => $entity_id,
+  );
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => $key->title,
+    '#maxlength' => 128,
   );
 
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#description' => t('The name of the public key. Will be filled in from the key comment if omitted.'),
-    '#size' => 40,
-    '#maxlength' => 255,
-  );
-  
-  $form['public_key'] = array(
+  //$form['key_upload'] = array(
+  //  '#type' => 'file',
+  //  '#title' => t('Upload your private key file'),
+  //);
+
+  $form['value'] = array(
     '#type' => 'textarea',
-    '#title' => t('Public key'),
-    '#description' => t('The contents of your public key file.'),
-    '#cols' => 40,
-    '#rows' => 5,
+    '#title' => t('Key'),
+    '#default_value' => $key->value,
+    '#rows' => 10,
+    '#wysiwyg' => FALSE,
     '#required' => TRUE,
   );
 
-  $form['save'] = array(
+  $form['actions'] = array(
+    '#weight' => 100,
+  );
+  $form['actions']['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
-
-  return $form;
-}
-
-function sshkey_add_public_key_form_validate($form, $form_state) {
-  module_load_include('inc', 'sshkey');
-  $values = $form_state['values'];
-  $user = $values['user_object'];
-
-  try {
-    // Parse the key
-    $pubkey = sshkey_public_key_parse($values['public_key']);
-
-    // Check if the key is blacklisted.
-    if (sshkey_public_key_blacklisted($pubkey['pubkey'])) {
-      form_set_error('public_key', t('The key you have used is blacklisted'));
-    }
-
-    // Check if the key exists
-    $exists = sshkey_public_key_load($pubkey['fingerprint']);
-    if ($exists) {
-      // Be a bit helpful and tell the user if the key has been added by herself,
-      // or if it's been added by someone else. Not sure how to treat the double-
-      // add scenario.
-      if ($exists['uid'] == $user->uid) {
-        form_set_error('public_key', t('You have already added this public key.'));
-      }
-      else {
-        form_set_error('public_key', t('This public key has already been added by someone else, contact the webmaster at @email if you have any questions or suspect malicious intent.', array(
-          '@email' => variable_get('site_mail', ''),
-        )));
-      }
-    }
-  }
-  catch (Exception $e) {
-    form_set_error('public_key', t('There was a problem with the key: !message', array(
-      '!message' => $e->getMessage(),
-    )));
-  }
-}
-
-function sshkey_add_public_key_form_submit($form, $form_state) {
-  $values = $form_state['values'];
-  $user = $values['user_object'];
-
-  try {
-    sshkey_public_key_save($user->uid, $values['public_key'], $values['name']);
-  }
-  catch (Exception $e) {
-    drupal_set_message(t('There was a problem saving your key: !message', array(
-      '!message' => $e->getMessage(),
-    )), 'error');
-  }
-}
-
-function sshkey_page_edit_public_key($key) {
-  return drupal_get_form('sshkey_edit_public_key_form', $key);
-}
-
-function sshkey_edit_public_key_form($form_state, $key) {
-  $form = array();
-  $data = sshkey_get_public_key_data($key['fingerprint']);
-
-  $segmented = array();
-  for ($i=0; $i<strlen($key['fingerprint']); $i+=2) {
-    $segmented[] = substr($key['fingerprint'], $i, 2);
-  }
-  $readable_fingerprint = join($segmented, ':');
-
-  $form['key_object'] = array(
-    '#type' => 'value',
-    '#value' => $data,
-  );
-
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#description' => t('The name that should be used for this key.'),
-    '#size' => 40,
-    '#maxlength' => 255,
-    '#default_value' => $key['name'],
-  );
-
-  $form['created'] = array(
-    '#type' => 'item',
-    '#title' => t('Created'),
-    '#value' => format_date($key['created']),
-  );
-
-  $form['fingerprint'] = array(
-    '#type' => 'item',
-    '#title' => t('Fingerprint'),
-    '#value' => $readable_fingerprint,
-  );
-
-  $form['public_key'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Public key'),
-    '#disabled' => TRUE,
-    '#value' => $data['pubkey'],
-    '#rows' => 8,
-  );
-
-  $form['save'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
-  return $form;
-}
-
-function sshkey_edit_public_key_form_submit($form, $form_state) {
-  $values = $form_state['values'];
-
-  $key = $values['key_object'];
-  $name = empty($values['name']) ? $key['comment'] : $values['name'];
-
-  sshkey_public_key_update($key['fingerprint'], $name);
-  drupal_goto();
-}
-
-function sshkey_page_delete_public_key($key) {
-  return drupal_get_form('sshkey_delete_public_key_form', $key);
-}
-
-function sshkey_delete_public_key_form($form_state, $key) {
-  $form['key_object'] = array(
-    '#type' => 'value',
-    '#value' => $key
-  );
-
-  $form['warning'] = array(
-    '#type' => 'item',
-    '#title' => t('Warning'),
-    '#value' => t('Your\'e about to delete a public key, effectively disabling access for any services that use it. Are you sure that you want to do this?'),
-  );
-
-  $destination = 'user/' . $key->uid . '/sshkeys';
-  if (isset($_REQUEST['destination'])) {
-    $destination = $_REQUEST['destination'];
-  }
-  $form['cancel'] = array(
-    '#type' => 'item',
+  $form['actions']['cancel'] = array(
+    '#type' => 'link',
     '#title' => t('Cancel'),
-    '#value' => l('Click here to cancel the deletion of the key', $destination),
-  );
-  
-  $form['delete'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete'),
+    '#href' => isset($_GET['destination']) ? $_GET['destination'] : '<front>',
   );
 
   return $form;
 }
 
-function sshkey_delete_public_key_form_submit($form, $form_state) {
-  $key = $form_state['values']['key_object'];
-  sshkey_public_key_delete($key['fingerprint']);
-  drupal_goto();
+function sshkey_edit_form_validate($form, &$form_state) {
+  // Import the uploaded key file.
+  //if ($file = file_save_upload('key_upload', array(), FALSE, FILE_EXISTS_REPLACE)) {
+  //  $contents = @file_get_contents($file->filepath);
+  //  file_delete($file->filepath);
+  //  if ($contents === FALSE) {
+  //    drupal_set_message(t('The public key import failed, because the file %filename could not be read.', array('%filename' => $file->filename)), 'error');
+  //  }
+  //  else {
+  //    $form_state['values']['value'] = $contents;
+  //  }
+  //}
+
+  sshkey_validate($form_state['values'], $form, $form_state);
+}
+
+function sshkey_edit_form_build_sshkey($form, &$form_state) {
+  // @todo Legacy support for modules that extend the node form with form-level
+  //   submit handlers that adjust $form_state['values'] prior to those values
+  //   being used to update the entity. Module authors are encouraged to instead
+  //   adjust the node directly within a hook_node_submit() implementation. For
+  //   Drupal 8, evaluate whether the pattern of triggering form-level submit
+  //   handlers during button-level submit processing is worth supporting
+  //   properly, and if so, add a Form API function for doing so.
+  unset($form_state['submit_handlers']);
+  form_execute_handlers('submit', $form, $form_state);
+
+  $node = $form_state['node'];
+  entity_form_submit_build_entity('sshkey', $node, $form, $form_state);
+
+  node_submit($node);
+  foreach (module_implements('node_submit') as $module) {
+    $function = $module . '_node_submit';
+    $function($node, $form, $form_state);
+  }
+  return $node;
+}
+
+function sshkey_edit_form_submit($form, &$form_state) {
+  $key = sshkey_edit_form_build_sshkey($form, $form_state);
+  form_state_values_clean($form_state);
+  $key = (object) $form_state['values'];
+  sshkey_save($key);
+  drupal_set_message(t('The SSH public key %title has been saved.', array('%title' => $key->title)));
+}
+
+function sshkey_delete_form($form, $form_state, $key) {
+  $form['#sshkey'] = $key;
+
+  $form['key_id'] = array(
+    '#type' => 'value',
+    '#value' => $key->key_id,
+  );
+
+  return confirm_form(
+    $form,
+    t('Are you sure you want to delete the public key %title?', array('%title' => $key->title)),
+    isset($_GET['destination']) ? $_GET['destination'] : '<front>',
+    '',
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+function sshkey_delete_form_submit($form, $form_state) {
+  sshkey_delete($form_state['values']['key_id']);
+  drupal_set_message(t('The SSH public key %title has been deleted.', array('%title' => $form['#sshkey']->title)));
 }
