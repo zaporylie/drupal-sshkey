@@ -171,30 +171,7 @@ function sshkey_edit_form_validate($form, &$form_state) {
   sshkey_validate($form_state['values'], $form, $form_state);
 }
 
-function sshkey_edit_form_build_sshkey($form, &$form_state) {
-  // @todo Legacy support for modules that extend the node form with form-level
-  //   submit handlers that adjust $form_state['values'] prior to those values
-  //   being used to update the entity. Module authors are encouraged to instead
-  //   adjust the node directly within a hook_node_submit() implementation. For
-  //   Drupal 8, evaluate whether the pattern of triggering form-level submit
-  //   handlers during button-level submit processing is worth supporting
-  //   properly, and if so, add a Form API function for doing so.
-  unset($form_state['submit_handlers']);
-  form_execute_handlers('submit', $form, $form_state);
-
-  $node = $form_state['node'];
-  entity_form_submit_build_entity('sshkey', $node, $form, $form_state);
-
-  node_submit($node);
-  foreach (module_implements('node_submit') as $module) {
-    $function = $module . '_node_submit';
-    $function($node, $form, $form_state);
-  }
-  return $node;
-}
-
 function sshkey_edit_form_submit($form, &$form_state) {
-  $key = sshkey_edit_form_build_sshkey($form, $form_state);
   form_state_values_clean($form_state);
   $key = (object) $form_state['values'];
   sshkey_save($key);

@@ -126,15 +126,6 @@ function sshkey_menu() {
     'file' => 'sshkey.pages.inc',
     'modal' => TRUE,
   );
-  $items['ssh-keys/%/%/%sshkey/export'] = array(
-    'title' => 'Export SSH key',
-    'page callback' => 'sshkey_export',
-    'page arguments' => array(3),
-    'access callback' => 'sshkey_access',
-    'access arguments' => array('export', 1, 2, 3),
-    'file' => 'sshkey.pages.inc',
-    'modal' => TRUE,
-  );
 
   $items['admin/config/system/ssh-keys'] = array(
     'title' => 'SSH public key settings',
@@ -175,7 +166,7 @@ function sshkey_views_api() {
 function sshkey_access($op, $entity_type = NULL, $entity_id = NULL, $key = NULL, $account = NULL) {
   $rights = &drupal_static(__FUNCTION__, array());
 
-  if (!in_array($op, array('view', 'create', 'edit', 'delete', 'export'), TRUE)) {
+  if (!in_array($op, array('view', 'create', 'edit', 'delete'), TRUE)) {
     // If $op was not one of the supported ones, we return access denied.
     return FALSE;
   }
