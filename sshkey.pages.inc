@@ -20,7 +20,7 @@ function sshkey_list_page($entity_type, $entity_id) {
 
   $header = array(
     'name' => array('data' => t('Title'), 'field' => 'title', 'sort' => 'asc'),
-    'fingerprint' => array('data' => t('Fingerpint'), 'field' => 'fingerprint'),
+    'fingerprint' => array('data' => t('Fingerprint'), 'field' => 'fingerprint'),
     'operations' => array('data' => t('Operations')),
   );
 
