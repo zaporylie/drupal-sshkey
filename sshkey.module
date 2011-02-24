@@ -398,7 +398,7 @@ function sshkey_delete_multiple($key_ids) {
  * Delete all SSH public keys associated with an entity.
  */
 function sshkey_delete_all_by_entity($entity_type, $entity_id) {
-  $key_ids = db_query("SELECT key_id FROM {sshkey} WHERE entity_type = :entity-type AND entity_id = :entity-id", array(':entity-type' => $entity_type, ':entity-id' => $entity_id))->fetchCol();
+  $key_ids = db_query("SELECT key_id FROM {sshkey} WHERE entity_type = :entitytype AND entity_id = :entityid", array(':entitytype' => $entity_type, ':entityid' => $entity_id))->fetchCol();
   return !empty($key_ids) ? sshkey_delete_multiple($key_ids) : FALSE;
 }
 
