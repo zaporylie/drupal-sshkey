@@ -140,6 +140,16 @@ function sshkey_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function sshkey_theme($existing, $type, $theme, $path) {
+  $info['sshkey_fingerprint'] = array(
+    'variables' => array('key' => NULL),
+  );
+  return $info;
+}
+
+/**
  * Implements hook_entity_delete().
  */
 function sshkey_entity_delete($entity, $entity_type) {
@@ -459,4 +469,13 @@ function sshkey_parse($key_raw) {
   }
 
   return $parsed;
+}
+
+/**
+ * Theme callback to output a formatted SSH key fingerprint.
+ */
+function theme_sshkey_fingerprint($variables) {
+  $key = $variables['key'];
+  $chunks = str_split($key->fingerprint, 2);
+  return implode(':', $chunks);
 }

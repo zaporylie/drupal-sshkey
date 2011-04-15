@@ -38,9 +38,7 @@ function sshkey_list_page($entity_type, $entity_id) {
     $key = $keys[$key_id];
 
     $rows[$key_id]['title'] = check_plain($key->title);
-
-    // @todo Format fingerprint as xx:xx:xx...
-    $rows[$key_id]['fingerprint'] = $key->fingerprint;
+    $rows[$key_id]['fingerprint'] = theme('sshkey_fingerprint', array('key' => $key));
 
     $operations = array();
     if (sshkey_access('edit', $entity_type, $entity_id, $key)) {
