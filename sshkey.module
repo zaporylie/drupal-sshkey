@@ -334,6 +334,7 @@ function sshkey_save($key) {
 
     // Allow other modules to alter the public key before saving.
     module_invoke_all('sshkey_presave', $key);
+    module_invoke_all('entity_presave', $key, 'sshkey');
 
     // Save the key to the database and invoke the post-save hooks.
     if ($key->is_new) {
