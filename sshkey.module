@@ -318,18 +318,18 @@ function sshkey_save($key) {
     }
 
     // Re-fingerprint the key.
-    $parsed = sshkey_parse($key->value, $key);
+    $parsed = sshkey_parse($key->value);
     $key->fingerprint = $parsed['fingerprint'];
+    $key->value = $parsed['value'];
 
     // Add a default name based on public key comment if available.
-    if (isset($parsed['comment'])) {
-      $key->value = trim(substr($key->value, 0, -strlen($parsed['comment'])));
-      if (empty($key->title)) {
+    if (empty($key->title)) {
+      if (isset($parsed['comment'])) {
         $key->title = truncate_utf8($parsed['comment'], 128, TRUE);
       }
-    }
-    if (empty($key->title)) {
-      $key->title = truncate_utf8($key->value, 26, FALSE);
+      else {
+        $key->title = truncate_utf8($key->value, 26, FALSE);
+      }
     }
 
     // Allow other modules to alter the public key before saving.
@@ -444,11 +444,11 @@ function sshkey_validate($key, $form, &$form_state) {
  *   The string with the raw SSH public key.
  */
 function sshkey_parse($key_raw) {
-  $parsed['raw'] = trim(preg_replace('/\s+/', ' ', $key_raw));
+  $parsed['value'] = trim(preg_replace('/\s+/', ' ', $key_raw));
 
   // The SSH key should be a string in the form:
   // "<algorithm type> <base64-encoded key> <comment>"
-  $key_parts = explode(' ', $parsed['raw'], 3);
+  $key_parts = explode(' ', $parsed['value'], 3);
   if (count($key_parts) < 2) {
     throw new SSHKeyParseException(t('The key is invalid.'));
   }

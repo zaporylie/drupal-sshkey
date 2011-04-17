@@ -120,6 +120,7 @@ function sshkey_edit_form($form, $form_state, $entity_type, $entity_id, $key = N
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
+    '#description' => t("If this field is left blank, the key's title will be automatically generated."),
     '#default_value' => $key->title,
     '#maxlength' => 128,
   );
