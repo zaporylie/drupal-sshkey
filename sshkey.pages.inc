@@ -36,6 +36,7 @@ function sshkey_list_page($entity_type, $entity_id) {
   $rows = array();
   foreach ($key_ids as $key_id) {
     $key = $keys[$key_id];
+    $key_base_uri = "ssh-keys/{$entity_type}/{$entity_id}/{$key_id}";
 
     $rows[$key_id]['title'] = check_plain($key->title);
     $rows[$key_id]['fingerprint'] = theme('sshkey_fingerprint', array('key' => $key));
@@ -44,7 +45,7 @@ function sshkey_list_page($entity_type, $entity_id) {
     if (sshkey_access('edit', $entity_type, $entity_id, $key)) {
       $operations['edit'] = array(
         'title' => t('Edit'),
-        'href' => "ssh-keys/{$entity_type}/{$entity_id}/{$key_id}/edit",
+        'href' => $key_base_uri . '/edit',
         'query' => $destination,
         'modal' => TRUE,
       );
@@ -52,7 +53,7 @@ function sshkey_list_page($entity_type, $entity_id) {
     if (sshkey_access('delete', $entity_type, $entity_id, $key)) {
       $operations['delete'] = array(
         'title' => t('Delete'),
-        'href' => "ssh-keys/{$entity_type}/{$entity_id}/{$key_id}/delete",
+        'href' => $key_base_uri . '/delete',
         'query' => $destination,
         'modal' => TRUE,
       );
