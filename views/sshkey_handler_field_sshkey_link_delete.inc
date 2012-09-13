@@ -12,7 +12,7 @@ class sshkey_handler_field_sshkey_link_delete extends sshkey_handler_field_sshke
 
     if (($key = sshkey_load($key_id)) && sshkey_access('delete', $this->entity_type, $entity_id, $key)) {
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = "ssh-keys/{$this->entity_type}/{$entity_id}/delete/{$key_id}";
+      $this->options['alter']['path'] = "ssh-keys/{$this->entity_type}/{$entity_id}/{$key_id}/delete";
       $this->options['alter']['query'] = drupal_get_destination();
 
       $text = !empty($this->options['text']) ? $this->options['text'] : t('Delete');

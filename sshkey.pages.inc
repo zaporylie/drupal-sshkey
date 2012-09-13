@@ -42,6 +42,12 @@ function sshkey_list_page($entity_type, $entity_id) {
     $rows[$key_id]['fingerprint'] = theme('sshkey_fingerprint', array('key' => $key));
 
     $operations = array();
+    if (sshkey_access('view', $entity_type, $entity_id, $key)) {
+      $operations['view'] = array(
+        'title' => t('View'),
+        'href' => $key_base_uri . '/view',
+      );
+    }
     if (sshkey_access('edit', $entity_type, $entity_id, $key)) {
       $operations['edit'] = array(
         'title' => t('Edit'),
@@ -85,6 +91,16 @@ function sshkey_list_page($entity_type, $entity_id) {
   //$build['post_add_form'] = '</div>';
 
   return $build;
+}
+
+/**
+ * Page callback for viewing an SSH key.
+ */
+function sshkey_view_key($entity_type, $entity_id, $key) {
+  // We are returning plain text, so tell the browser.
+  drupal_add_http_header('Content-Type', 'text/plain; charset=utf-8');
+  print $key->value;
+  drupal_page_footer();
 }
 
 function sshkey_edit_form($form, $form_state, $entity_type, $entity_id, $key = NULL) {

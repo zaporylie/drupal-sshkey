@@ -108,6 +108,14 @@ function sshkey_menu() {
     'file' => 'sshkey.pages.inc',
     'modal' => TRUE,
   );
+  $items['ssh-keys/%/%/%sshkey/view'] = array(
+    'title' => 'View SSH key',
+    'page callback' => 'sshkey_view_key',
+    'page arguments' => array(1, 2, 3),
+    'access callback' => 'sshkey_access',
+    'access arguments' => array('view', 1, 2, 3),
+    'file' => 'sshkey.pages.inc',
+  );
   $items['ssh-keys/%/%/%sshkey/edit'] = array(
     'title' => 'Edit SSH key',
     'page callback' => 'drupal_get_form',

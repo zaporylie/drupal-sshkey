@@ -13,6 +13,7 @@ class sshkey_handler_field_sshkey_operations extends views_handler_field {
 
   function option_definition() {
     $options = parent::option_definition();
+    $options['view_text'] = array('default' => '', 'translatable' => TRUE);
     $options['edit_text'] = array('default' => '', 'translatable' => TRUE);
     $options['delete_text'] = array('default' => '', 'translatable' => TRUE);
     return $options;
@@ -20,6 +21,11 @@ class sshkey_handler_field_sshkey_operations extends views_handler_field {
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
+    $form['view_text'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Text to display for view links'),
+      '#default_value' => $this->options['view_text'],
+    );
     $form['edit_text'] = array(
       '#type' => 'textfield',
       '#title' => t('Text to display for edit links'),
@@ -66,17 +72,23 @@ class sshkey_handler_field_sshkey_operations extends views_handler_field {
     $destination = drupal_get_destination();
 
     $operations = array();
+    if (sshkey_access('view', $this->entity_type, $entity_id, $keyy)) {
+      $operations['view'] = array(
+        'title' => !empty($this->options['view_text']) ? $this->options['view_text'] : t('View'),
+        'href' => "ssh-keys/{$this->entity_type}/{$entity_id}/{$key_id}/view",
+      );
+    }
     if (sshkey_access('edit', $this->entity_type, $entity_id, $key)) {
       $operations['edit'] = array(
         'title' => !empty($this->options['edit_text']) ? $this->options['edit_text'] : t('Edit'),
-        'href' => "ssh-keys/{$this->entity_type}/{$entity_id}/edit/{$key_id}",
+        'href' => "ssh-keys/{$this->entity_type}/{$entity_id}/{$key_id}/edit",
         'query' => $destination,
       );
     }
     if (sshkey_access('delete', $this->entity_type, $entity_id, $key)) {
       $operations['delete'] = array(
         'title' => !empty($this->options['delete_text']) ? $this->options['delete_text'] : t('Delete'),
-        'href' => "ssh-keys/{$this->entity_type}/{$entity_id}/delete/{$key_id}",
+        'href' => "ssh-keys/{$this->entity_type}/{$entity_id}/{$key_id}/delete",
         'query' => $destination,
       );
     }

@@ -141,6 +141,15 @@ function sshkey_views_data() {
     ),
   );
 
+  $data['sshkey']['view_sshkey'] = array(
+    'field' => array(
+      'title' => t('View link'),
+      'help' => t('Provide a simple link to view the SSH key.'),
+      'handler' => 'sshkey_handler_field_sshkey_link_view',
+      'entity_tables' => $entity_tables,
+    ),
+  );
+
   $data['sshkey']['edit_sshkey'] = array(
     'field' => array(
       'title' => t('Edit link'),
