@@ -18,6 +18,14 @@ class SSHKeyTestCaseHelper extends DrupalWebTestCase {
     $key->fingerprint = md5($key_value);
     return $key;
   }
+
+  public function assertFingerprintText($key) {
+    return $this->assertText(theme('sshkey_fingerprint', array('key' => $key)));
+  }
+
+  public function assertNoFingerprintText($key) {
+    return $this->assertNoText(theme('sshkey_fingerprint', array('key' => $key)));
+  }
 }
 
 class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
@@ -59,7 +67,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $edit['value'] = $key->value;
     $this->drupalPost(NULL, $edit, 'Save');
     $this->assertText("The SSH public key {$key->title} has been saved.");
-    $this->assertText($key->fingerprint);
+    $this->assertFingerprintText($key);
 
     // Edit the key to use a comment as the title.
     $this->clickLink('Edit', 1);
@@ -67,7 +75,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $edit['value'] = $key->value . ' Test comment';
     $this->drupalPost(NULL, $edit, 'Save');
     $this->assertText("The SSH public key Test comment has been saved.");
-    $this->assertText($key->fingerprint);
+    $this->assertFingerprintText($key);
 
     // Edit the key to use a comment as the title.
     $this->clickLink('Edit', 1);
@@ -75,7 +83,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $edit['value'] = $key->value;
     $this->drupalPost(NULL, $edit, 'Save');
     $this->assertText("The SSH public key Test title has been saved.");
-    $this->assertText($key->fingerprint);
+    $this->assertFingerprintText($key);
 
     // Attempt to insert a duplicate key.
     $this->clickLink('Add a public key');
