@@ -349,11 +349,13 @@ function sshkey_save($key) {
       drupal_write_record('sshkey', $key);
       module_invoke_all('sshkey_insert', $key);
       module_invoke_all('entity_insert', $key, 'sshkey');
+      watchdog('sshkey', 'Added new SSH key %key (@fingerprint).', array('%key' => $key->title, '@fingerprint' => $key->fingerprint));
     }
     else {
       drupal_write_record('sshkey', $key, array('key_id'));
       module_invoke_all('sshkey_update', $key);
       module_invoke_all('entity_update', $key, 'sshkey');
+      watchdog('sshkey', 'Updated SSH key %key (@fingerprint).', array('%key' => $key->title, '@fingerprint' => $key->fingerprint));
     }
 
     // Clear internal properties.
@@ -396,6 +398,7 @@ function sshkey_delete_multiple($key_ids) {
     foreach ($keys as $key_id => $key) {
       module_invoke_all('sshkey_delete', $key);
       module_invoke_all('entity_delete', $key, 'sshkey');
+      watchdog('sshkey', 'Deleted SSH key %key (@fingerprint).', array('%key' => $key->title, '@fingerprint' => $key->fingerprint));
     }
 
     db_delete('sshkey')
