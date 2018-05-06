@@ -25,7 +25,8 @@ define('SSHKEY_ACCESS_IGNORE', NULL);
 /**
  * Exception thrown if a public key does not parse correctly.
  */
-class SSHKeyParseException extends Exception { }
+class SSHKeyParseException extends Exception {
+}
 
 /**
  * Implements hook_entity_info().
@@ -458,7 +459,7 @@ function sshkey_parse($key_raw) {
   $parsed['value'] = trim(preg_replace('/\s+/', ' ', $key_raw));
 
   // The SSH key should be a string in the form:
-  // "<algorithm type> <base64-encoded key> <comment>"
+  // "<algorithm type> <base64-encoded key> <comment>".
   $key_parts = explode(' ', $parsed['value'], 3);
   if (count($key_parts) < 2) {
     throw new SSHKeyParseException(t('The key is invalid.'));
