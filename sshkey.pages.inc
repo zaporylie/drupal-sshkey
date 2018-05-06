@@ -86,10 +86,6 @@ function sshkey_list_page($entity_type, $entity_id) {
   );
   $build['keys_table_pager'] = array('#theme' => 'pager');
 
-  //$build['pre_form_title'] = '<div><hr /><h3>Add a public key</h3>';
-  //$build['add_form'] = drupal_get_form('sshkey_edit_form', $entity_type, $entity_id);
-  //$build['post_add_form'] = '</div>';
-
   return $build;
 }
 
@@ -141,11 +137,6 @@ function sshkey_edit_form($form, $form_state, $entity_type, $entity_id, $key = N
     '#maxlength' => 128,
   );
 
-  //$form['key_upload'] = array(
-  //  '#type' => 'file',
-  //  '#title' => t('Upload your private key file'),
-  //);
-
   $form['value'] = array(
     '#type' => 'textarea',
     '#title' => t('Key'),
@@ -172,18 +163,6 @@ function sshkey_edit_form($form, $form_state, $entity_type, $entity_id, $key = N
 }
 
 function sshkey_edit_form_validate($form, &$form_state) {
-  // Import the uploaded key file.
-  //if ($file = file_save_upload('key_upload', array(), FALSE, FILE_EXISTS_REPLACE)) {
-  //  $contents = @file_get_contents($file->filepath);
-  //  file_delete($file->filepath);
-  //  if ($contents === FALSE) {
-  //    drupal_set_message(t('The public key import failed, because the file %filename could not be read.', array('%filename' => $file->filename)), 'error');
-  //  }
-  //  else {
-  //    $form_state['values']['value'] = $contents;
-  //  }
-  //}
-
   sshkey_validate($form_state['values'], $form, $form_state);
 }
 
