@@ -465,8 +465,11 @@ function sshkey_parse($key_raw) {
   }
 
   $parsed['algorithm'] = $key_parts[0];
-  if (!in_array($parsed['algorithm'], array('ssh-rsa', 'ssh-dss'))) {
-    throw new SSHKeyParseException(t("The key is invalid. It must begin with <em>ssh-rsa</em> or <em>ssh-dss</em>."));
+  $algorithms = variable_get('sshkey_algorithms', array('ssh-rsa', 'ssh-dss', 'ssh-ed25519'));
+  if (!in_array($parsed['algorithm'], $algorithms)) {
+    // Produces a string like "ssh-rsa, ssh-dss, or ssh-ed25519".
+    $algorithm_string = implode(', or ', array_filter(array_merge(array(implode(', ', array_slice($algorithms, 0, -1))), array_slice($algorithms, -1)), 'strlen'));
+    throw new SSHKeyParseException(t('The key is invalid. It must begin with %algorithms.', array('%algorithms' => $algorithm_string)));
   }
 
   $parsed['key'] = $key_parts[1];

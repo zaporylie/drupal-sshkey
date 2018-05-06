@@ -58,7 +58,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
 
     $edit['value'] = 'ssh-foo ' . $this->randomName();
     $this->drupalPost(NULL, $edit, 'Save');
-    $this->assertText('The key is invalid. It must begin with ssh-rsa or ssh-dss.');
+    $this->assertText('The key is invalid. It must begin with ssh-rsa, ssh-dss, or ssh-ed25519.');
 
     // Add a key only using its key value, so its title should then be
     // auto-generated from the key value.
