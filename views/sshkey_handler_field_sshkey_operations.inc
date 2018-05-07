@@ -6,6 +6,7 @@
  */
 
 class sshkey_handler_field_sshkey_operations extends views_handler_field {
+
   function construct() {
     parent::construct();
     $this->additional_fields['key_id'] = 'key_id';
@@ -42,8 +43,9 @@ class sshkey_handler_field_sshkey_operations extends views_handler_field {
     $base_table = $this->view->base_table;
 
     // If the current field is under a relationship you can't be sure that the
-    // base table of the view is the base table of the current field.
-    // For example a field from a node author on a node view does have users as base table.
+    // base table of the view is the base table of the current field. For
+    // example a field from a node author on a node view does have users as
+    // base table.
     if (!empty($this->relationship)) {
       foreach ($this->view->relationship as $relationship) {
         if ($relationship->alias == $this->relationship) {
@@ -94,10 +96,16 @@ class sshkey_handler_field_sshkey_operations extends views_handler_field {
     }
 
     if (!empty($operations)) {
-      return theme('links', array('links' => $operations, 'attributes' => array('class' => array('links', 'inline', 'nowrap'))));
+      return theme('links', array(
+        'links' => $operations,
+        'attributes' => array(
+          'class' => array('links', 'inline', 'nowrap'),
+        ),
+      ));
     }
     else {
       return '';
     }
   }
+
 }

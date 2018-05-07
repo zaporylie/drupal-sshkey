@@ -6,6 +6,7 @@
  */
 
 class sshkey_handler_field_sshkey_link_view extends sshkey_handler_field_sshkey_link {
+
   function render($values) {
     $key_id = $values->{$this->aliases['key_id']};
     $entity_id = $values->{$this->aliases['entity_id']};
@@ -20,4 +21,5 @@ class sshkey_handler_field_sshkey_link_view extends sshkey_handler_field_sshkey_
 
     return '';
   }
+
 }

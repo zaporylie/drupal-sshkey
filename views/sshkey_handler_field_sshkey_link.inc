@@ -6,6 +6,7 @@
  */
 
 class sshkey_handler_field_sshkey_link extends views_handler_field {
+
   function construct() {
     parent::construct();
     $this->additional_fields['key_id'] = 'key_id';
@@ -52,4 +53,5 @@ class sshkey_handler_field_sshkey_link extends views_handler_field {
     $this->ensure_my_table();
     $this->add_additional_fields();
   }
+
 }

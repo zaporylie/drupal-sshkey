@@ -1,6 +1,7 @@
 <?php
 
 class SSHKeyTestCaseHelper extends DrupalWebTestCase {
+
   public function setUp() {
     list($modules) = func_get_args() + array(0 => array());
 
@@ -26,9 +27,11 @@ class SSHKeyTestCaseHelper extends DrupalWebTestCase {
   public function assertNoFingerprintText($key) {
     return $this->assertNoText(theme('sshkey_fingerprint', array('key' => $key)));
   }
+
 }
 
 class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
+
   public static function getInfo() {
     return array(
       'name' => 'SSH key functional test',
@@ -102,4 +105,5 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $this->drupalGet("user/{$this->admin_user->uid}/ssh-keys");
     $this->assertResponse(403);
   }
+
 }
