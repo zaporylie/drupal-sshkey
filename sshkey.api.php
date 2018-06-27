@@ -47,16 +47,6 @@ function hook_sshkey_access($op, $entity_type, $entity_id, $key, $account) {
 }
 
 /**
- * Act on SSH keys being loaded from the database.
- *
- * @param $keys
- *   An array of SSH keys, keyed by key ID.
- */
-function hook_sshkey_load(array &$keys) {
-
-}
-
-/**
  * Act on an SSH key being inserted or updated.
  *
  * This hook is invoked from sshkey_save() before the SSH key is saved to the
