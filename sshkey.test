@@ -113,4 +113,19 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $this->assertResponse(403);
   }
 
+  public function testCleanWhitespace() {
+    $whitespace = "\n ";
+
+    $key1 = $this->randomSSHPublicKey()->value;
+    $invalid_key1 = substr_replace($key1, $whitespace, 22, 0);
+    $invalid_key1 = substr_replace($invalid_key1, $whitespace, 34, 0);
+    $this->assertEqual($key1, sshkey_clean_whitespace($invalid_key1), 'Key with invalid whitespace successfully cleaned.');
+
+    $comment = $this->randomName() . ' ' . $this->randomName();
+    $key2 = $this->randomSSHPublicKey()->value . ' ' . $comment;
+    $invalid_key2 = substr_replace($key2, $whitespace, 18, 0);
+    $invalid_key2 = substr_replace($invalid_key2, $whitespace, 27, 0);
+    $this->assertEqual($key2, sshkey_clean_whitespace($invalid_key2), 'Key with invalid whitespace (and comment) successfully cleaned.');
+  }
+
 }

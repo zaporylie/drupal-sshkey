@@ -454,7 +454,7 @@ function sshkey_validate($key, $form, &$form_state) {
  *   The string with the raw SSH public key.
  */
 function sshkey_parse($key_raw) {
-  $parsed['value'] = trim(preg_replace('/\s+/', ' ', $key_raw));
+  $parsed['value'] = sshkey_clean_whitespace($key_raw);
 
   // The SSH key should be a string in the form:
   // "<algorithm type> <base64-encoded key> <comment>".
@@ -490,6 +490,53 @@ function sshkey_parse($key_raw) {
   }
 
   return $parsed;
+}
+
+/**
+ * Attempt to clean up extra whitespace in the key, before parsing.
+ *
+ * @param string $key_raw
+ *   The raw (provided) key.
+ *
+ * @return string
+ *   A key containing correct whitespace.
+ */
+function sshkey_clean_whitespace($key_raw) {
+  // Replace all consecutive whitespace characters with a single space.
+  $key = trim(preg_replace('/\s+/', ' ', $key_raw));
+
+  // Ignore keys that contain just 1 space.
+  if (substr_count($key, ' ') <= 1) {
+    return $key;
+  }
+
+  // Split the key type (e.g. 'ssh-rsa') from the rest of the key.
+  list($type, $rest) = explode(' ', $key, 2);
+
+  // Go through the space-separated parts of $rest, concatenating them into
+  // $value, to create the longest possible base64-encoded string. Any
+  // left-over parts will be considered as the key's "comment".
+  $value = '';
+  $comment = '';
+  $parts = explode(' ', $rest);
+  foreach ($parts as $index => $part) {
+    $valid = $value !== '' && base64_decode($value, TRUE) !== FALSE;
+    $valid_next = $value !== '' && base64_decode($value . $part, TRUE) !== FALSE;
+    if ($valid && !$valid_next) {
+      $comment = implode(' ', array_slice($parts, $index));
+      break;
+    }
+    $value .= $part;
+  }
+
+  // If it was not possible to generate any valid base64-encoded string, then
+  // return the key with all spaces preserved. The key will probably fail
+  // validation.
+  if (empty($valid)) {
+    return $key;
+  }
+
+  return trim($type . ' ' . $value . ' ' . $comment);
 }
 
 /**
