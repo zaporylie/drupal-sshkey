@@ -1,24 +1,22 @@
 <?php
 
 /**
+ * @file
  * Allows SSH keys to be associated with entities.
  */
 
 /**
- * Modules should return this value from hook_sshkey_access() to allow access
- * to an SSH key.
+ * Return value for hook_sshkey_access() to allow access to an SSH key.
  */
 define('SSHKEY_ACCESS_ALLOW', 'allow');
 
 /**
- * Modules should return this value from hook_sshkey_access() to deny access
- * to a SSH key.
+ * Return value for hook_sshkey_access() to deny access to a SSH key.
  */
 define('SSHKEY_ACCESS_DENY', 'deny');
 
 /**
- * Modules should return this value from hook_sshkey_access() to not affect
- * SSH key access.
+ * Return value for hook_sshkey_access() to not affect SSH key access.
  */
 define('SSHKEY_ACCESS_IGNORE', NULL);
 
@@ -466,10 +464,10 @@ function sshkey_parse($key_raw) {
   }
 
   $parsed['algorithm'] = $key_parts[0];
-  $algorithms = variable_get('sshkey_algorithms', array('ssh-rsa', 'ssh-dss', 'ssh-ed25519'));
+  $algorithms = variable_get('sshkey_algorithms', ['ssh-rsa', 'ssh-dss', 'ssh-ed25519']);
   if (!in_array($parsed['algorithm'], $algorithms)) {
     // Produces a string like "ssh-rsa, ssh-dss, or ssh-ed25519".
-    $algorithm_string = implode(', or ', array_filter(array_merge(array(implode(', ', array_slice($algorithms, 0, -1))), array_slice($algorithms, -1)), 'strlen'));
+    $algorithm_string = implode(', or ', array_filter(array_merge([implode(', ', array_slice($algorithms, 0, -1))], array_slice($algorithms, -1)), 'strlen'));
     throw new SSHKeyParseException(t('The key is invalid. It must begin with %algorithms.', array('%algorithms' => $algorithm_string)));
   }
 
