@@ -42,8 +42,15 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
 
   public function setUp() {
     parent::setUp();
-    $this->normal_user = $this->drupalCreateUser(array('view own SSH public keys', 'manage own SSH public keys', 'access user profiles'));
-    $this->admin_user = $this->drupalCreateUser(array('administer users', 'administer SSH public keys'));
+    $this->normal_user = $this->drupalCreateUser([
+      'view own SSH public keys',
+      'manage own SSH public keys',
+      'access user profiles',
+    ]);
+    $this->admin_user = $this->drupalCreateUser([
+      'administer users',
+      'administer SSH public keys',
+    ]);
   }
 
   public function testUserKeys() {
