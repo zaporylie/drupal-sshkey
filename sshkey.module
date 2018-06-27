@@ -472,7 +472,7 @@ function sshkey_parse($key_raw) {
   }
 
   $parsed['key'] = $key_parts[1];
-  $key_base64_decoded = base64_decode($parsed['key']);
+  $key_base64_decoded = base64_decode($parsed['key'], TRUE);
   if ($key_base64_decoded === FALSE) {
     throw new SSHKeyParseException(t('The key could not be decoded.'));
   }
