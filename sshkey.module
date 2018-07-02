@@ -479,10 +479,17 @@ function sshkey_parse($key_raw) {
   }
 
   $parsed['key'] = $key_parts[1];
+  // Decode the key, if it is valid base64.
   $key_base64_decoded = base64_decode($parsed['key'], TRUE);
   if ($key_base64_decoded === FALSE) {
     throw new SSHKeyParseException(t('The key could not be decoded.'));
   }
+  // Check if the data has okay data.
+  $expected_prefix = pack('N', strlen($parsed['algorithm'])) . $parsed['algorithm'];
+  if (strpos($key_base64_decoded, $expected_prefix) !== 0) {
+    throw new SSHKeyParseException(t('The key is invalid. It is not a public key.'));
+  }
+
   $parsed['fingerprint'] = md5($key_base64_decoded);
 
   if (isset($key_parts[2])) {
