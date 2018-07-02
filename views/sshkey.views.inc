@@ -12,7 +12,7 @@ function sshkey_views_data() {
   // Basic table information.
   $data['sshkey']['table']['group'] = t('SSH keys');
 
-  // Advertise this table as a possible base table
+  // Advertise this table as a possible base table.
   $data['sshkey']['table']['base'] = array(
     'field' => 'key_id',
     'title' => t('SSH Public keys'),
@@ -36,7 +36,6 @@ function sshkey_views_data() {
     $entity_tables[$entity_info['base table']] = $entity_type;
   }
 
-  // {sshkey}.key_id
   $data['sshkey']['key_id'] = array(
     'title' => t('SSH key ID'),
     'help' => t('The internal ID of the SSH key.'),
@@ -56,7 +55,6 @@ function sshkey_views_data() {
     ),
   );
 
-  // {sshkey}.fingerprint
   $data['sshkey']['fingerprint'] = array(
     'title' => t('Fingerprint'),
     'help' => t('The MD5 fingerprint of the SSH key.'),
@@ -76,7 +74,6 @@ function sshkey_views_data() {
     ),
   );
 
-  // {sshkey}.title
   $data['sshkey']['title'] = array(
     'title' => t('Title'),
     'help' => t('The title of the SSH key.'),
@@ -96,7 +93,6 @@ function sshkey_views_data() {
     ),
   );
 
-  // {sshkey}.value
   $data['sshkey']['value'] = array(
     'title' => t('Key value'),
     'help' => t('The raw value of the SSH key.'),
@@ -116,7 +112,6 @@ function sshkey_views_data() {
     ),
   );
 
-  // {sshkey}.changed
   $data['sshkey']['changed'] = array(
     'title' => t('Last modified'),
     'help' => t('The last date/time the SSH key was modified.'),
