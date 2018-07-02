@@ -475,7 +475,7 @@ function sshkey_parse($key_raw) {
       [implode(', ', array_slice($algorithms, 0, -1))],
       array_slice($algorithms, -1)
     ));
-    throw new SSHKeyParseException(t('The key is invalid. It must begin with %algorithms.', array('%algorithms' => $algorithm_string)));
+    throw new SSHKeyParseException(t('The key is invalid. It must begin with @algorithms.', ['@algorithms' => $algorithm_string]));
   }
 
   $parsed['key'] = $key_parts[1];
