@@ -118,7 +118,10 @@ function hook_sshkey_delete($key) {
  *   The form being used to edit the SSH key.
  * @param $form_state
  *   The form state array.
+ * @param array $parsed
+ *   The parsed key. This contains the elements 'algorithm', 'key',
+ *   'fingerprint', and 'comment'.
  */
-function hook_sshkey_validate($key, $form, $form_state) {
+function hook_sshkey_validate($key, $form, $form_state, array $parsed) {
 
 }

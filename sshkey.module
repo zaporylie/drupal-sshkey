@@ -438,12 +438,13 @@ function sshkey_validate($key, $form, &$form_state) {
   }
   catch (SSHKeyParseException $e) {
     form_set_error('value', $e->getMessage());
+    return;
   }
 
   // Allow other modules to validate the SSH public key.
   foreach (module_implements('sshkey_validate') as $module) {
     $function = $module . '_sshkey_validate';
-    $function($key, $form, $form_state);
+    $function($key, $form, $form_state, $parsed);
   }
 }
 
