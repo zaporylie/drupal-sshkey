@@ -82,9 +82,9 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     // Edit the key to use a comment as the title.
     $this->clickLink('Edit', 1);
     $edit['title'] = '';
-    $edit['value'] = $key->value . ' Test comment';
+    $edit['value'] = $key->value . ' test@comment';
     $this->drupalPost(NULL, $edit, 'Save');
-    $this->assertText("The SSH public key Test comment has been saved.");
+    $this->assertText("The SSH public key test@comment has been saved.");
     $this->assertFingerprintText($key);
 
     // Edit the key to use a comment as the title.
@@ -121,7 +121,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
     $invalid_key1 = substr_replace($invalid_key1, $whitespace, 34, 0);
     $this->assertEqual($key1, sshkey_clean_whitespace($invalid_key1), 'Key with invalid whitespace successfully cleaned.');
 
-    $comment = $this->randomName() . ' ' . $this->randomName();
+    $comment = $this->randomName() . '@' . $this->randomName();
     $key2 = $this->randomSSHPublicKey()->value . ' ' . $comment;
     $invalid_key2 = substr_replace($key2, $whitespace, 18, 0);
     $invalid_key2 = substr_replace($invalid_key2, $whitespace, 27, 0);
