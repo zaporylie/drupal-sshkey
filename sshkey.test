@@ -11,7 +11,7 @@ class SSHKeyTestCaseHelper extends DrupalWebTestCase {
 
   public function randomSSHPublicKey($type = 'ssh-rsa', $length = 276) {
     $key = new stdClass();
-    $key_value = '';
+    $key_value = pack('N', strlen($type)) . $type;
     for ($i = 0; $i <= $length; $i++) {
       $key_value .= chr(mt_rand(32, 122));
     }
