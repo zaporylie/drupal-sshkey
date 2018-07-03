@@ -97,7 +97,7 @@ class SSHKeyFunctionalTestCase extends SSHKeyTestCaseHelper {
 
     // Attempt to insert a duplicate key.
     $this->clickLink('Add a public key');
-    $edit['value'] = $key->value . ' Duplicate key';
+    $edit['value'] = $key->value . ' duplicate@key';
     $this->drupalPost(NULL, $edit, 'Save');
     $this->assertText("The public key with fingerprint {$key->fingerprint} is already in use.");
     $this->clickLink('Cancel');
