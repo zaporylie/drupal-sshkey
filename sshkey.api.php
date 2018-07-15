@@ -37,7 +37,7 @@
  *   A user object representing the user for whom the operation is to be
  *   performed.
  *
- * @return
+ * @return string|null
  *   SSHKEY_ACCESS_ALLOW if the operation is to be allowed; SSHKEY_ACCESS_DENY
  *   if the operation is to be denied; SSHKEY_ACCESSS_IGNORE to not affect this
  *   operation at all.
