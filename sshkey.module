@@ -68,14 +68,23 @@ function sshkey_permission() {
     'view own SSH public keys' => array(
       'title' => t('View own SSH public keys'),
     ),
+    'edit any SSH public keys' => array(
+      'title' => t('Edit any SSH public keys'),
+      'restrict access' => TRUE,
+    ),
+    'edit own SSH public keys' => array(
+      'title' => t('Edit own SSH public keys'),
+    ),
     'manage any SSH public keys' => array(
-      'title' => t('Manage any SSH public keys'),
+      'title' => t('Create and delete any SSH public keys'),
+      'restrict access' => TRUE,
     ),
     'manage own SSH public keys' => array(
-      'title' => t('Manage own SSH public keys'),
+      'title' => t('Create and delete own SSH public keys'),
     ),
     'administer SSH public keys' => array(
       'title' => t('Administer SSH public keys'),
+      'restrict access' => TRUE,
     ),
   );
   return $perm;
@@ -250,6 +259,18 @@ function sshkey_sshkey_access($op, $entity_type, $entity_id, $key, $account) {
       $entity = entity_load($entity_type, array($entity_id));
       $entity = reset($entity);
       if (isset($entity->uid) && $entity->uid == $account->uid && user_access('view own SSH public keys')) {
+        return SSHKEY_ACCESS_ALLOW;
+      }
+    }
+  }
+  elseif ($op == 'edit') {
+    if (user_access('edit any SSH public keys')) {
+      return SSHKEY_ACCESS_ALLOW;
+    }
+    else {
+      $entity = entity_load($entity_type, array($entity_id));
+      $entity = reset($entity);
+      if (isset($entity->uid) && $entity->uid == $account->uid && user_access('edit own SSH public keys')) {
         return SSHKEY_ACCESS_ALLOW;
       }
     }
