@@ -25,6 +25,35 @@ class SshKeyItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultFieldSettings() {
+    return [
+      'algorithm' => [],
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $settings = $this->getSettings();
+    $element['algorithm'] = [
+      '#required' => TRUE,
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Algorithm'),
+      '#default_value' => $settings['algorithm'],
+//      '#multiple' => TRUE,
+      '#options' => [
+        'ssh-rsa' => 'ssh-rsa',
+        'ssh-dss' => 'ssh-dss',
+        'ssh-ed25519' => 'ssh-ed25519',
+      ],
+    ];
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEmpty() {
     $value = $this->get('value')->getValue();
     return $value === NULL || $value === '';
@@ -60,7 +89,12 @@ class SshKeyItem extends FieldItemBase {
   public function onChange($property_name, $notify = TRUE) {
     if ($property_name == 'value') {
       $property = $this->get('value')->getValue();
-      $this->writePropertyValue('fingerprint', (string) $property);
+      // @todo: Get an actual fingerprint.
+      $this->writePropertyValue('fingerprint', md5($property));
+      if (!$this->get('name')->getValue()) {
+        // Get comment from the key.
+        $this->writePropertyValue('name', md5($property));
+      }
     }
     parent::onChange($property_name, $notify);
   }
@@ -98,7 +132,7 @@ class SshKeyItem extends FieldItemBase {
 
     // @DCG Suppose our value must not be longer than 10 characters.
     $options['name']['Length']['max'] = 128;
-    $options['value']['SshKey'] = [];
+    $options['value']['SshKey']['algorithm'] = $this->getFieldDefinition()->getSetting('algorithm');
 
     // @DCG
     // See /core/lib/Drupal/Core/Validation/Plugin/Validation/Constraint

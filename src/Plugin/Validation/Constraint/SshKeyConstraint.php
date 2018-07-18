@@ -18,4 +18,19 @@ class SshKeyConstraint extends Constraint {
 
   public $message = 'This key is not valid.';
 
+  public $algorithm = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultOption() {
+    return 'algorithm';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRequiredOptions() {
+    return ['algorithm'];
+  }
 }

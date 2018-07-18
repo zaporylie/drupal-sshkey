@@ -10,9 +10,19 @@ field.field_settings.sshkey_default:
   type: mapping
   label: SSH Key field settings
   mapping:
-    bar:
-      type: string
-      label: Bar
+    algorithm:
+      type: mapping
+      label: Algorithm
+      mapping:
+        ssh-rsa:
+          type: boolean
+          label: ssh-rsa
+        ssh-dss:
+          type: boolean
+          label: ssh-dss
+        ssh-ed25519:
+          type: boolean
+          label: ssh-ed25519
 
 field.value.sshkey_default:
   type: mapping
@@ -21,6 +31,12 @@ field.value.sshkey_default:
     value:
       type: label
       label: Value
+    fingerprint:
+      type: label
+      label: Fingerprint
+    name:
+      type: label
+      label: Name
 
 field.formatter.settings.sshkey_fingerprint:
   type: mapping

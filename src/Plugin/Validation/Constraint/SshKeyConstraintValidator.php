@@ -17,6 +17,9 @@ class SshKeyConstraintValidator extends ConstraintValidator {
     try {
       list($algorithm, $key, $comment) = array_pad(explode(' ', $value, 3), 3, NULL);
       // @todo: Validate algorithm.
+      if (!in_array($algorithm, array_filter($constraint->algorithm))) {
+        throw new \Exception('Invalid algorithm');
+      }
       // Validate if key can be decoded.
       $key_base64_decoded = base64_decode($key, TRUE);
       if ($key_base64_decoded === FALSE) {
