@@ -1,0 +1,62 @@
+field.storage_settings.sshkey_default:
+  type: mapping
+  label: SSH Key storage settings
+  mapping:
+    foo:
+      type: string
+      label: Foo
+
+field.field_settings.sshkey_default:
+  type: mapping
+  label: SSH Key field settings
+  mapping:
+    bar:
+      type: string
+      label: Bar
+
+field.value.sshkey_default:
+  type: mapping
+  label: Default value
+  mapping:
+    value:
+      type: label
+      label: Value
+
+field.formatter.settings.sshkey_fingerprint:
+  type: mapping
+  label: Fingerprint formatter settings
+  mapping:
+    prefix:
+      type: string
+      label: Prefix
+    suffix:
+      type: string
+      label: Suffix
+
+field.widget.settings.sshkey_textarea:
+  type: mapping
+  label: Textarea widget settings
+  mapping:
+    size:
+      type: integer
+      label: size
+    placeholder:
+      type: string
+      label: Placeholder
+    prefix:
+      type: string
+      label: Prefix
+    suffix:
+      type: string
+      label: Suffix
+
+field.formatter.settings.sshkey_name:
+  type: mapping
+  label: Name formatter settings
+  mapping:
+    prefix:
+      type: string
+      label: Prefix
+    suffix:
+      type: string
+      label: Suffix
