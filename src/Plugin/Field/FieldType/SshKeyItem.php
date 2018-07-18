@@ -8,9 +8,12 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\sshkey\Utils;
 
 /**
  * Defines the 'sshkey_default' field type.
+ *
+ * @todo: Allow to choose fingerprint algorithm.
  *
  * @FieldType(
  *   id = "sshkey_default",
@@ -41,7 +44,6 @@ class SshKeyItem extends FieldItemBase {
       '#type' => 'checkboxes',
       '#title' => $this->t('Algorithm'),
       '#default_value' => $settings['algorithm'],
-//      '#multiple' => TRUE,
       '#options' => [
         'ssh-rsa' => 'ssh-rsa',
         'ssh-dss' => 'ssh-dss',
@@ -89,11 +91,12 @@ class SshKeyItem extends FieldItemBase {
   public function onChange($property_name, $notify = TRUE) {
     if ($property_name == 'value') {
       $property = $this->get('value')->getValue();
+      $utils = Utils::initialize($property);
       // @todo: Get an actual fingerprint.
-      $this->writePropertyValue('fingerprint', md5($property));
+      $this->writePropertyValue('fingerprint', $utils->getFingerprintMd5());
       if (!$this->get('name')->getValue()) {
         // Get comment from the key.
-        $this->writePropertyValue('name', md5($property));
+        $this->writePropertyValue('name', $utils->getComment());
       }
     }
     parent::onChange($property_name, $notify);

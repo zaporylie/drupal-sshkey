@@ -2,6 +2,7 @@
 
 namespace Drupal\sshkey\Plugin\Validation\Constraint;
 
+use Drupal\sshkey\Utils;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -15,7 +16,9 @@ class SshKeyConstraintValidator extends ConstraintValidator {
    */
   public function validate($value, Constraint $constraint) {
     try {
-      list($algorithm, $key, $comment) = array_pad(explode(' ', $value, 3), 3, NULL);
+      $utils = Utils::initialize($value);
+      $algorithm = $utils->getAlgorithm();
+      $key = $utils->getKey();
       // @todo: Validate algorithm.
       if (!in_array($algorithm, array_filter($constraint->algorithm))) {
         throw new \Exception('Invalid algorithm');
