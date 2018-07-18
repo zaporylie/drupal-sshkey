@@ -1,8 +1,0 @@
-name = "SSH public keys"
-description = "Allows users to associated public keys with their user accounts."
-core = 7.x
-files[] = sshkey.test
-files[] = views/sshkey_handler_field_sshkey_operations.inc
-files[] = views/sshkey_handler_field_sshkey_link.inc
-files[] = views/sshkey_handler_field_sshkey_link_edit.inc
-files[] = views/sshkey_handler_field_sshkey_link_delete.inc
