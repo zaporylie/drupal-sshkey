@@ -148,10 +148,10 @@ class SshKeyItem extends FieldItemBase {
 
     $columns = [
       'value' => [
-        'type' => 'varchar',
-        'not null' => FALSE,
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
         'description' => 'The raw key value.',
-        'length' => 255,
       ],
       'fingerprint' => [
         'type' => 'varchar',
