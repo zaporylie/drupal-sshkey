@@ -177,16 +177,6 @@ function sshkey_entity_delete($entity, $entity_type) {
 }
 
 /**
- * Implements hook_views_api().
- */
-function sshkey_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'sshkey') . '/views',
-  );
-}
-
-/**
  * Access callback for SSH public key operations.
  */
 function sshkey_access($op, $entity_type = NULL, $entity_id = NULL, $key = NULL, $account = NULL) {
