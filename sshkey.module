@@ -26,22 +26,6 @@ define('SSHKEY_ACCESS_IGNORE', NULL);
 class SSHKeyParseException extends Exception {
 }
 
-/**
- * Implements hook_entity_info().
- */
-function sshkey_entity_info() {
-  $info['sshkey'] = array(
-    'label' => t('SSH Key'),
-    'base table' => 'sshkey',
-    'entity keys' => array(
-      'id' => 'key_id',
-      'label' => 'title',
-    ),
-    'fieldable' => FALSE,
-  );
-
-  return $info;
-}
 
 /**
  * Implements hook_help().
@@ -163,17 +147,6 @@ function sshkey_theme($existing, $type, $theme, $path) {
     'variables' => array('key' => NULL),
   );
   return $info;
-}
-
-/**
- * Implements hook_entity_delete().
- */
-function sshkey_entity_delete($entity, $entity_type) {
-  if ($entity_type == 'sshkey') {
-    return;
-  }
-  list($id) = entity_extract_ids($entity_type, $entity);
-  sshkey_delete_all_by_entity($entity_type, $id);
 }
 
 /**
