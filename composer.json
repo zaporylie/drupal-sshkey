@@ -1,0 +1,30 @@
+{
+    "name": "drupal/sshkey",
+    "type": "drupal-module",
+    "description": "Provides a new field type to collect a ssh public keys.",
+    "keywords": ["Drupal"],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://drupal.org/project/sshkey",
+    "minimum-stability": "dev",
+    "repositories": {
+        "0": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        },
+        "1": {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "composer/composer": "^1.3 || ^2.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.5",
+        "drupal/coder": "^8.3",
+        "phpcompatibility/php-compatibility": "*"
+    },
+    "config": {
+        "bin-dir": "bin/",
+        "sort-packages": true
+    }
+}

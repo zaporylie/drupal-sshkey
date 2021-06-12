@@ -3,5 +3,6 @@ type: module
 description: "Provides a new field type to collect a ssh public keys."
 package: Field types
 core: 8.x
+core_version_requirement: ^8 || ^9
 dependencies:
   - field
